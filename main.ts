@@ -1,17 +1,12 @@
-input.onButtonEvent(Button.A, input.buttonEventClick(), function () {
-    bJoy = false
-    basic.showIcon(IconNames.ArrowWest)
-})
 function fServo (pJoy: number) {
-    if (lcd16x2rgb.between(pJoy, 126, 134)) {
-        qwiicjoystick.comment("Ruhestellung soll 512 ist 498 auf 512 = 90° anpassen")
-        qwiicjoystick.comment("Ruhestellung soll 128 ist xx auf 128 = 90° anpassen")
+    if (lcd16x2rgb.between(pJoy, 122, 134)) {
+        qwiicjoystick.comment("Ruhestellung soll 128 ist auf 128 = 90° anpassen")
         return 90
     } else if (pJoy < 20) {
-        qwiicjoystick.comment("Werte < 8 wie 0 behandeln (max links)")
+        qwiicjoystick.comment("Werte < 20 wie 0 behandeln (max links)")
         return 135
     } else if (pJoy > 235) {
-        qwiicjoystick.comment("Werte > 250 wie 255 behandeln (max rechts)")
+        qwiicjoystick.comment("Werte > 235 wie 255 behandeln (max rechts)")
         return 45
     } else {
         qwiicjoystick.comment("Werte von 32 bis 991 auf 46° bis 134° verteilen")
@@ -29,10 +24,6 @@ function m5Joystick () {
     iServo = fServo(oBuffer.getUint8(1))
     fServoDisplay(oBuffer.getUint8(1))
 }
-input.onButtonEvent(Button.B, input.buttonEventClick(), function () {
-    bJoy = true
-    basic.showIcon(IconNames.ArrowEast)
-})
 function fServoDisplay (pJoy: number) {
     lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 0, 0, 3, pJoy, lcd16x2rgb.eAlign.right)
     if (pJoy > 0 && pJoy < xmin) {
@@ -45,7 +36,7 @@ function fServoDisplay (pJoy: number) {
 }
 function qwiicJoystick () {
     aJoy = qwiicjoystick.readArray(qwiicjoystick.qwiicjoystick_eADDR(qwiicjoystick.eADDR.Joystick_x20), qwiicjoystick.eBereich.B_0_255)
-    iMotor = Math.trunc(aJoy[0])
+    iMotor = aJoy[0]
     iServo = fServo(aJoy[1])
     fServoDisplay(aJoy[1])
 }
@@ -53,7 +44,6 @@ let aJoy: number[] = []
 let iServo = 0
 let iMotor = 0
 let oBuffer: i2c.i2cclass = null
-let bJoy = false
 let xmax = 0
 let xmin = 0
 lcd16x2rgb.initLCD(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E))
