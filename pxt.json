@@ -1,0 +1,27 @@
+{
+    "name": "car4-sender-m5j",
+    "version": "0.0.1",
+    "description": "",
+    "dependencies": {
+        "core": "*",
+        "radio": "*",
+        "joystick": "github:calliope-net/joystick#v2.0.5",
+        "lcd-16x2": "github:calliope-net/lcd-16x2#v2.0.5"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "target": "4.0.29",
+        "targetId": "calliopemini"
+    },
+    "supportedTargets": [
+        "calliopemini"
+    ],
+    "preferredEditor": "blocksprj"
+}
