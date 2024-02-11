@@ -34,13 +34,40 @@ function fServoDisplay (pJoy: number) {
         lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 0, 8, 11, xmax, lcd16x2rgb.eAlign.right)
     }
 }
+function qwiicJoystick2 () {
+    oBuffer2 = i2c.fromArray2([3])
+    oBuffer2.i2cWriteBuffer(i2c.i2c_eADDR(i2c.eADDR.Joystick_x20), true)
+    oBuffer = i2c.i2cReadBuffer(i2c.i2c_eADDR(i2c.eADDR.Joystick_x20), 3)
+    iMotor = oBuffer.getUint8(0)
+    lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 0, 12, 15, iMotor, lcd16x2rgb.eAlign.right)
+    if (lcd16x2rgb.between(iMotor, 124, 132)) {
+        iMotor = 128
+    }
+    iServo = fServo(oBuffer.getUint8(2))
+    fServoDisplay(oBuffer.getUint8(2))
+}
 function qwiicJoystick () {
     aJoy = qwiicjoystick.readArray(qwiicjoystick.qwiicjoystick_eADDR(qwiicjoystick.eADDR.Joystick_x20), qwiicjoystick.eBereich.B_0_255)
     iMotor = aJoy[0]
+    lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 0, 12, 15, iMotor, lcd16x2rgb.eAlign.right)
+    if (lcd16x2rgb.between(iMotor, 124, 132)) {
+        iMotor = 128
+    }
     iServo = fServo(aJoy[1])
     fServoDisplay(aJoy[1])
 }
+function analogJoystick () {
+    iMotor = pins.analogReadPin(AnalogPin.C16)
+    lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 0, 12, 15, iMotor, lcd16x2rgb.eAlign.right)
+    iMotor = Math.constrain(Math.round(Math.map(iMotor, 240, 784, 255, 0)), 0, 255)
+    if (lcd16x2rgb.between(iMotor, 124, 136)) {
+        iMotor = 128
+    }
+    iServo = pins.analogReadPin(AnalogPin.C17)
+    iServo = Math.round(Math.map(iServo, 240, 784, 135, 45))
+}
 let aJoy: number[] = []
+let oBuffer2: i2c.i2cclass = null
 let iServo = 0
 let iMotor = 0
 let oBuffer: i2c.i2cclass = null
@@ -57,9 +84,9 @@ loops.everyInterval(500, function () {
     if (iFahrstrecke == 1) {
         basic.setLedColor(0x007fff)
         if (true) {
-            m5Joystick()
+            analogJoystick()
         } else {
-            qwiicJoystick()
+            qwiicJoystick2()
         }
         qwiicjoystick.comment("0 Motor 0..128..255")
         lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 1, 0, 3, iServo, lcd16x2rgb.eAlign.right)
