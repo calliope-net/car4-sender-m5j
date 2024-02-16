@@ -1,3 +1,6 @@
+function SENDoBuffer () {
+    radio.sendBuffer(oBufferSend.i2c_toBuffer())
+}
 function fServo (pJoy: number) {
     if (lcd16x2rgb.between(pJoy, 122, 134)) {
         qwiicjoystick.comment("Ruhestellung soll 128 ist auf 128 = 90° anpassen")
@@ -80,11 +83,12 @@ xmin = 128
 xmax = 128
 basic.pause(1000)
 let iFahrstrecke = 1
+let oBufferSend = i2c.create(2)
 loops.everyInterval(500, function () {
     if (iFahrstrecke == 1) {
         basic.setLedColor(0x007fff)
         if (true) {
-            analogJoystick()
+            m5Joystick()
         } else {
             qwiicJoystick2()
         }
@@ -92,10 +96,9 @@ loops.everyInterval(500, function () {
         lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 1, 0, 3, iServo, lcd16x2rgb.eAlign.right)
         lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 1, 12, 15, iMotor, lcd16x2rgb.eAlign.right)
         qwiicjoystick.comment("1 Servo 0..128..255 -> 45..90..135")
-        qwiicjoystick.setSendeZahl(NumberFormat.Int8LE, qwiicjoystick.eOffset.z0, iMotor)
-        qwiicjoystick.setSendeZahl(NumberFormat.Int8LE, qwiicjoystick.eOffset.z1, iServo)
-        qwiicjoystick.setSendeZahl(NumberFormat.Int8LE, qwiicjoystick.eOffset.z2, 0)
-        radio.sendNumber(qwiicjoystick.getSendeZahl())
+        oBufferSend.setUint8(0, iMotor)
+        oBufferSend.setUint8(1, iServo)
+        SENDoBuffer()
         basic.turnRgbLedOff()
     }
 })
