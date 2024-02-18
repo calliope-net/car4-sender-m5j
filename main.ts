@@ -16,6 +16,9 @@ function fServo (pJoy: number) {
         return Math.round(Math.map(pJoy, 20, 235, 134, 46))
     }
 }
+input.onButtonEvent(Button.AB, input.buttonEventClick(), function () {
+    bMotorPower = !(bMotorPower)
+})
 function m5Joystick () {
     oBuffer = i2c.i2cReadBuffer(i2c.i2c_eADDR(i2c.eADDR.Joystick_x52), 3)
     iMotor = oBuffer.getUint8(0)
@@ -59,6 +62,11 @@ function qwiicJoystick () {
     iServo = fServo(aJoy[1])
     fServoDisplay(aJoy[1])
 }
+function fBits () {
+    b = 0
+    b = bit.setBit(b, 7, bMotorPower)
+    return b
+}
 function analogJoystick () {
     iMotor = pins.analogReadPin(AnalogPin.C16)
     lcd16x2rgb.writeText(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E), 0, 12, 15, iMotor, lcd16x2rgb.eAlign.right)
@@ -69,11 +77,13 @@ function analogJoystick () {
     iServo = pins.analogReadPin(AnalogPin.C17)
     iServo = Math.round(Math.map(iServo, 240, 784, 135, 45))
 }
+let b = 0
 let aJoy: number[] = []
 let oBuffer2: i2c.i2cclass = null
 let iServo = 0
 let iMotor = 0
 let oBuffer: i2c.i2cclass = null
+let bMotorPower = false
 let xmax = 0
 let xmin = 0
 lcd16x2rgb.initLCD(lcd16x2rgb.lcd16x2_eADDR(lcd16x2rgb.eADDR_LCD.LCD_16x2_x3E))
@@ -86,7 +96,11 @@ let iFahrstrecke = 1
 let oBufferSend = i2c.create(8)
 loops.everyInterval(500, function () {
     if (iFahrstrecke == 1) {
-        basic.setLedColor(0x007fff)
+        if (bMotorPower) {
+            basic.setLedColor(0x00ff00)
+        } else {
+            basic.setLedColor(0x007fff)
+        }
         if (false) {
             m5Joystick()
         } else {
@@ -98,6 +112,7 @@ loops.everyInterval(500, function () {
         qwiicjoystick.comment("1 Servo 0..128..255 -> 45..90..135")
         oBufferSend.setUint8(0, iMotor)
         oBufferSend.setUint8(1, iServo)
+        oBufferSend.setUint8(3, fBits())
         SENDoBuffer()
         basic.turnRgbLedOff()
     }
