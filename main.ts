@@ -83,11 +83,11 @@ xmin = 128
 xmax = 128
 basic.pause(1000)
 let iFahrstrecke = 1
-let oBufferSend = i2c.create(2)
+let oBufferSend = i2c.create(8)
 loops.everyInterval(500, function () {
     if (iFahrstrecke == 1) {
         basic.setLedColor(0x007fff)
-        if (true) {
+        if (false) {
             m5Joystick()
         } else {
             qwiicJoystick2()
